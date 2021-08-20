@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML5 Canvas</title>
+</head>
+<body>
+    <h1>Draw something!</h1>
+    <canvas id="draw"></canvas>
+
+    <script>
+        const canvas = document.querySelector('#draw');
+        const ctx = canvas.getContext('2d');
+        canvas.width = (window.innerWidth - 100);
+        canvas.height = (window.innerHeight - 110);
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = 1;
+        // default setting
+        ctx.globalCompositeOperation = 'source-over';
+
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let hue = 0;
+        let direction = false;
+
+        function draw(e) {
+            // stop func from running when user has not moused down 
+            // if isDrawing is true, this statement will resolve to false the code below it will run
+            if (!isDrawing) return; 
+            console.log(e);
+            // set stroke color to hsl starting at hue 0 - red
+            ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+            ctx.beginPath();
+            // starting coordinates
+            ctx.moveTo(lastX, lastY);
+            // ending coordiantes
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+            // reassign lastX and lastY variables to mouse coordinates where user has moused down with destructured syntax
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+            // incremet the hue every time the mousemove event is fired
+            hue++;
+            // reset hue to 0 if greater or equal to 360 
+            if (hue >= 360) {
+                hue = 0;
+            }
+            // if line width reaches max or min, coerce direction's boolean value
+            if (ctx.lineWidth >= 100 || ctx.lineWidth <= 1) {
+                direction = !direction
+            }
+            // if direction is true, increment line width, else decrement line width
+            // direction is set to false with an initial value of 1. when the event is first triggered, direction will be flipped to true in the 'if' statement above and the line width will increment until it hits 1  
+            if (direction) {
+                ctx.lineWidth++;
+            } else {
+                ctx.lineWidth--;
+            }
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true
+            // set drawing starting points to coordiantes of mouse down
+            lastX = e.offsetX
+            lastY = e.offsetY;
+            console.log(e);
+        });
+
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('mouseout', () => isDrawing = false);
+
+
+        console.log(canvas);
+        console.log(canvas.height);
+    </script>
+
+    <style>
+        body {
+            height: 100vh;
+            width: 100vw;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        canvas {
+            border: 2px solid black;
+        }
+    </style>
+    
+</body>
+</html>
